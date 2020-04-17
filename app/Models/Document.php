@@ -18,7 +18,7 @@ class Document
 
     public function __construct($layout)
     {
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 3000);
         $this->layout = new TemplateProcessor($layout);
         $this->parameters = $this->layout->getVariables();
         $this->_path_file_generate    = storage_path('app/generate/');
@@ -62,7 +62,6 @@ class Document
             $this->data[$value] = '';
            }
         }
-        
         $this->layout->setValues($this->data);
     }
     private function generateParametersBlock(){
