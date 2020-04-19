@@ -41,6 +41,22 @@ class TemplateProcessor extends PhpWordTemplateProcessor
         }
         return $xmlBlock;
     }
+    /**
+     * Set values from a one-dimensional array of "variable => value"-pairs.
+     *
+     * @param array $values
+     */
+    public function setValues(array $values)
+    {
+        foreach ($values as $macro => $replace) {
+            $is_image = strpos($macro, 'image_');
+            if($is_image !== false){
+                $this->setImageValue($macro, $replace);
+            }else{
+                $this->setValue($macro, $replace);
+            }
+        }
+    }
     private function replaceIterator($xmlBlock,$iterator){
         $pattern = '/\[([a-zA-Z])\]/';
         $replace = "$iterator";

@@ -26,8 +26,8 @@ class MainController extends Controller
         $document->setData($request->data);
 
         $document->generate();
-        $file = $document->export('ejemplo');
-       // unlink($document->getPathFileTmp());
+        $file = $document->export();
+        unlink($document->getPathFileTmp());
 
         if($request->has('file')){
             unlink($file_tmp);

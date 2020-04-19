@@ -16,6 +16,10 @@ function transformObjectToString($data){
                 $data_return = array_merge($data_return,transformProperty($value,$key));
                 break;
             case 'string':
+                $is_image = strpos($key, 'image_');
+                if($is_image !== false){
+                    $value = saveFile($value);
+                }
                 $data_return[$key] = $value;
                 break;
             default:
@@ -61,13 +65,45 @@ function convertToArray($data){
             
         }
     }
-
     return $return_data;
 }
+function saveFile($data,$type = 'base64'){
+    $path = storage_path('app/img/tmp');
+    $imgdata = base64_decode($data);
+    $mimetype = getImageMimeType($imgdata);
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+    $file = $path.'/'.time().'.'.$mimetype;
+    file_put_contents($file, base64_decode($data));
+    return $file;
+}
 
-// 14 => "plants0.employees.employe_id#1"
-//   15 => "plants0.employees.employe_name#1"
-//   16 => "plants0.employees.reg_hrs#1"
-//   17 => "plants0.employees.reg_pay#1"
-//   18 => "plants0.employees.ot_hrs#1"
-//   19 => "plants0.employees.ot_pay#1"
+function getBytesFromHexString($hexdata)
+{
+  for($count = 0; $count < strlen($hexdata); $count+=2)
+    $bytes[] = chr(hexdec(substr($hexdata, $count, 2)));
+
+  return implode($bytes);
+}
+
+function getImageMimeType($imagedata)
+{
+  $imagemimetypes = array( 
+    "jpeg" => "FFD8", 
+    "png" => "89504E470D0A1A0A", 
+    "gif" => "474946",
+    "bmp" => "424D", 
+    "tiff" => "4949",
+    "tiff" => "4D4D"
+  );
+
+  foreach ($imagemimetypes as $mime => $hexbytes)
+  {
+    $bytes = getBytesFromHexString($hexbytes);
+    if (substr($imagedata, 0, strlen($bytes)) == $bytes)
+      return $mime;
+  }
+
+  return "png";
+}
