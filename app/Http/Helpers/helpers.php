@@ -18,7 +18,7 @@ function transformObjectToString($data){
             case 'string':
                 $is_image = strpos($key, 'image_');
                 if($is_image !== false){
-                    $value = saveFile($value);
+                    $value = isValidImage($value);
                 }
                 $data_return[$key] = $value;
                 break;
@@ -106,4 +106,23 @@ function getImageMimeType($imagedata)
   }
 
   return "png";
+}
+
+function isValidImage($data){
+    if (base64_encode(base64_decode($data, true)) === $data){
+        return saveFile($data);
+    }
+    $re = '/^[^?]*\.(jpg|jpeg|gif|png)/m';
+    preg_match_all($re, $data, $matches, PREG_SET_ORDER, 0);
+    if(count($matches)> 0){
+        $arrContextOptions=array(
+            "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+            ),
+        );  
+        $image = file_get_contents($data,false, stream_context_create($arrContextOptions));
+        return saveFile(base64_encode($image));
+    }
+    return '';
 }

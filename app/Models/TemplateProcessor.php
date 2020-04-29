@@ -50,7 +50,7 @@ class TemplateProcessor extends PhpWordTemplateProcessor
     {
         foreach ($values as $macro => $replace) {
             $is_image = strpos($macro, 'image_');
-            if($is_image !== false){
+            if($is_image !== false && $replace !== ''){
                 $this->setImageValue($macro, $replace);
             }else{
                 $this->setValue($macro, $replace);
@@ -61,6 +61,5 @@ class TemplateProcessor extends PhpWordTemplateProcessor
         $pattern = '/\[([a-zA-Z])\]/';
         $replace = "$iterator";
         return preg_replace($pattern, $replace, $xmlBlock);
-    }
-    
+    }    
 }
