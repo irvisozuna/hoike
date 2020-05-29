@@ -17,4 +17,5 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('/render','MainController@render');
+$router->post('/render','MainController@render');
+$router->get('/merge','ExampleController@merge');

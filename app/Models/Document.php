@@ -23,6 +23,7 @@ class Document
         $this->parameters = $this->layout->getVariables();
         $this->_path_file_generate    = storage_path('app/generate/');
         $this->_path_file_tmp         = storage_path('app/tmp/');
+        $this->name = time();
     }
 
     public function getParams(){
@@ -30,9 +31,8 @@ class Document
     }
 
     public function setData(array $data){
-        $data = json_decode(json_encode($data), FALSE);
-        
-        $this->original_data = $data;
+        $data = $this->str_replace_json("&","",$data);
+        $this->original_data = $this->str_replace_json("&","",$data);
         $this->data = transformObjectToString($data);
         $this->proccessParameters();
     }
@@ -88,5 +88,13 @@ class Document
                 }
             }
         }
+    }
+    private function clearSpecialCharacters($data){
+        $data = json_encode($data);
+        dd($data);
+        return json_decode($data, FALSE);
+    }
+    private function str_replace_json($search, $replace, $subject){
+        return json_decode(str_replace($search, $replace,  json_encode($subject)),FALSE);
     }
 }

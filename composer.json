@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.2.5",
+        "iio/libmergepdf": "^4.0",
         "krustnic/docx-merge": "^1.0",
         "laravel/lumen-framework": "^7.0",
         "phpoffice/phpword": "^0.17.0"

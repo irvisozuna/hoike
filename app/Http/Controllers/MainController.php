@@ -21,7 +21,7 @@ class MainController extends Controller
        
         $file_tmp = $this->saveFile($request);
         $document = new Document($file_tmp);
-
+        
         // Table with a spanned cell
         $document->setData($request->data);
 
@@ -36,7 +36,7 @@ class MainController extends Controller
         return response()->download($file);
     }
     private function saveFile(Request $request){
-        $file = storage_path('app/layouts/').'FORMATO - NOMINA TACNA.docx';
+        $file = storage_path('app/layouts/').'LISTA_DE_RAYA.docx';
         if($request->has('file') && isset($request->file['data'])){
             if (!file_exists(storage_path('app/layouts/upload'))) {
                 mkdir(storage_path('app/layouts/upload'), 0777, true);

@@ -14,6 +14,7 @@ class TemplateProcessor extends PhpWordTemplateProcessor
             $this->tempDocumentMainPart,
             $matches
         );
+        
         if (isset($matches[2])) {
             $xmlBlock = $matches[2];
             if ($indexVariables) {
