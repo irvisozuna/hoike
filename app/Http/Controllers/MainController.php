@@ -22,6 +22,7 @@ class MainController extends Controller
         $file_tmp = $this->saveFile($request);
         $document = new Document($file_tmp);
         
+
         // Table with a spanned cell
         $document->setData($request->data);
 

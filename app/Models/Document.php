@@ -62,6 +62,7 @@ class Document
             $this->data[$value] = '';
            }
         }
+        //dd($this->layout->getVariables(),$this->data);
         $this->layout->setValues($this->data);
     }
     private function generateParametersBlock(){
@@ -71,6 +72,22 @@ class Document
                 $this->layout->cloneBlockWithTable($key,count($value));
                 $after_key = str_replace("block_", "", $key);
                 $this->generateParametersRow($value,$after_key);
+            }elseif(strpos($key, 'items_') !== false){
+                
+                $items_values = [];
+                foreach($this->original_data->{$key} as $k => $item){
+                    foreach (transformObjectToString($item) as $l => $val) {
+                        # code...
+                        $items_values[$k][$key] = "";
+                        $items_values[$k][$key.$k.".".$l] = $val;
+                    }
+                }
+                //dd($items_values);
+                $this->layout->cloneRowAndSetValuesArray($key, $items_values);
+                unset($this->data[$key]);
+               // dd($items_values);
+                //$key.$k.
+                //items_NoParte0.no_parte.original
             }elseif(is_array($value)){
                 foreach ($value as $k => $v) {
                     $value[$k]->{$key} = '';

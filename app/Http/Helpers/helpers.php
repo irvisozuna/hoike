@@ -2,14 +2,16 @@
 function transformObjectToString($data){
 
     $data_return = [];
+    
     foreach ($data as $key => $value) {
-        
         switch (gettype($value)) {
             case 'array':
                 $is_block = strpos($key, 'block_');
                 if($is_block !== false){
                     $after_key = str_replace("block_", "", $key);
                     $data_return = array_merge($data_return,transformObjectToString(transformBlock($value,$after_key)));
+                }else{
+                    $data_return = array_merge($data_return,transformObjectToString(transformBlock($value,$key)));
                 }
                 break;
             case 'object':

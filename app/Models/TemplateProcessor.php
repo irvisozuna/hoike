@@ -58,9 +58,77 @@ class TemplateProcessor extends PhpWordTemplateProcessor
             }
         }
     }
+    public function cloneRowAndSetValuesArray($search, $values)
+    {
+        $this->cloneRowArray($search, count($values));
+
+        
+        foreach ($values as $rowKey => $rowData) {
+            foreach ($rowData as $macro => $replace) {
+                $this->setValue($macro, $replace);
+            }
+        }
+    }
     private function replaceIterator($xmlBlock,$iterator){
         $pattern = '/\[([a-zA-Z])\]/';
         $replace = "$iterator";
         return preg_replace($pattern, $replace, $xmlBlock);
-    }    
+    }
+    public function cloneRowArray($search, $numberOfClones)
+    {
+        $search = static::ensureMacroCompleted($search);
+
+        $tagPos = strpos($this->tempDocumentMainPart, $search);
+        if (!$tagPos) {
+            throw new Exception('Can not clone row, template variable not found or variable contains markup.');
+        }
+
+        $rowStart = $this->findRowStart($tagPos);
+        $rowEnd = $this->findRowEnd($tagPos);
+        $xmlRow = $this->getSlice($rowStart, $rowEnd);
+
+        // Check if there's a cell spanning multiple rows.
+        if (preg_match('#<w:vMerge w:val="restart"/>#', $xmlRow)) {
+            // $extraRowStart = $rowEnd;
+            $extraRowEnd = $rowEnd;
+            while (true) {
+                $extraRowStart = $this->findRowStart($extraRowEnd + 1);
+                $extraRowEnd = $this->findRowEnd($extraRowEnd + 1);
+
+                // If extraRowEnd is lower then 7, there was no next row found.
+                if ($extraRowEnd < 7) {
+                    break;
+                }
+
+                // If tmpXmlRow doesn't contain continue, this row is no longer part of the spanned row.
+                $tmpXmlRow = $this->getSlice($extraRowStart, $extraRowEnd);
+                if (!preg_match('#<w:vMerge/>#', $tmpXmlRow) &&
+                    !preg_match('#<w:vMerge w:val="continue"\s*/>#', $tmpXmlRow)) {
+                    break;
+                }
+                // This row was a spanned row, update $rowEnd and search for the next row.
+                $rowEnd = $extraRowEnd;
+            }
+            $xmlRow = $this->getSlice($rowStart, $rowEnd);
+        }
+
+        $result = $this->getSlice(0, $rowStart);
+        
+        $result .= implode($this->indexClonedVariablesArray($numberOfClones, $xmlRow));
+        $result .= $this->getSlice($rowEnd);
+
+        $this->tempDocumentMainPart = $result;
+    }
+    protected function indexClonedVariablesArray($count, $xmlBlock)
+    {
+        $results = array();
+        for ($i = 0; $i < $count; $i++) {
+            $pattern = '/\[([a-zA-Z])\]/';
+            $replace = $i;
+            $results[] = preg_replace($pattern, $replace, $xmlBlock);
+            //$results[] = preg_replace('/\$\{(.*?)\}/', '\${\\1[' . $i . ']}', $xmlBlock);
+        }
+
+        return $results;
+    }
 }
