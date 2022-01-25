@@ -76,7 +76,7 @@ function saveFile($data,$type = 'base64'){
     if (!file_exists($path)) {
         mkdir($path, 0777, true);
     }
-    $file = $path.'/'.time().'.'.$mimetype;
+    $file = $path.'/'.microtime().'.'.$mimetype;
     file_put_contents($file, base64_decode($data));
     return $file;
 }
